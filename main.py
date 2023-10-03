@@ -1,5 +1,5 @@
 from collections import deque
-
+# regaeghe
 graph = {}
 graph['Me'] = ['Alica','Piter', 'Alex']
 graph['Alica'] = ['Sam', 'Katy', 'Poly']
