@@ -21,17 +21,28 @@ day = {
     4: 'Friday'
 }
 
+#алгоритм расчёта рабочитх дней
 def count_working_days(year, month):
     cal = calendar.monthcalendar(year, month)
-    working_days = sum(1 for week in cal for day in week if day != 0 and day < 6)
-    return working_days
+    working_days_count = 0
+
+    for week in cal:
+        for day in week:
+            # Добавляем только дни текущего месяца
+            if day != 0:
+                # Добавляем только рабочие дни (пн-пт)
+                if calendar.weekday(year, month, day) < 5:
+                    working_days_count += 1
+
+    return working_days_count
+#создание базы данных
 def create_database(year):
     connect = sq.connect(f'{year}.db')
     create_month_table(connect)
     create_days_table(connect, year)
     connect.close()
 
-
+#создание таблицы месяцев
 def create_month_table(connect):
     for i in range (1,13):
         quary_create_table= f'''
@@ -47,8 +58,9 @@ def create_month_table(connect):
         '''
         connect.cursor().execute(quary_insert, (month[i],))
         connect.commit()
-
+#создание и заполнение таблицы дней
 def create_days_table (connect, year):
+
     for i in range(1,13):
         quary_create_table = f'''
         CREATE TABLE IF NOT EXISTS DaysOfWeek{month[i]}(
@@ -59,14 +71,25 @@ def create_days_table (connect, year):
         )
         '''
         connect.cursor().execute(quary_create_table)
-        for j in range(1, count_working_days(year, i) + 1):
+        connect.commit()
+        count = 0#получение первого рабочего дня месяца
+        #заполнение дней в таблице дней
+        for _ in range(1, count_working_days(year, i) + 1):
+
             query_insert = f'''
             INSERT INTO DaysofWeek{month[i]}(month_id, name)
             VALUES (?,?)
            '''
-            connect.cursor().execute(query_insert, (i,))
+            connect.cursor().execute(query_insert, (i,day[count],))
 
+            if count == 4:
+                count = 0
+            else:
+                count += 1
         connect.commit()
+
+
+
 
 create_database(2023)
 
