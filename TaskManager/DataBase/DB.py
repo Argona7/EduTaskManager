@@ -64,7 +64,7 @@ def create_days_table (connect, year):
             INSERT INTO DaysofWeek{month[i]}(month_id, name)
             VALUES (?,?)
            '''
-            connect.cursor().execute(query_insert, (i, ))
+            connect.cursor().execute(query_insert, (i,))
 
         connect.commit()
 
