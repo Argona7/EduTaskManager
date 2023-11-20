@@ -13,7 +13,7 @@ libs_name = list_libs.replace(",", "").split(" ")
 
 def create_env():
     sc('@title = "Rupy -v:0.3.2a --update:creating venv"')
-    chdir("..\\..\\")
+    chdir("../../venv\\")
     sc("python -m venv .\\rupy_env")
     chdir(".\\tools\\")
     sc("start .\\update.bat")
@@ -27,7 +27,7 @@ def install_libs():
 
 
 def run_main_script():
-    chdir("..\\..\\tools\\")
+    chdir("../../tools\\")
     sc("start .\\run.bat")
 
 
