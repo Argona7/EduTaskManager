@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+<<<<<<< HEAD
   <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.11 (EduTaskManager) (2)" project-jdk-type="Python SDK" />
+=======
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.10 (pythonProject)" project-jdk-type="Python SDK" />
+>>>>>>> 2160ba34bd658163000e951daa0c2a3fceab337c
 </project>
