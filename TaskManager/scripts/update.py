@@ -8,6 +8,7 @@ from os.path import exists
 
 
 list_libs = ""
+libs_name = list_libs.replace(",", "").split(" ")
 
 
 def create_env():
@@ -20,7 +21,7 @@ def create_env():
 
 def install_libs():
     sc('@title = "Rupy -v:0.0.1a --update:installing libs"')
-    libs_name = list_libs.replace(",", "").split(" ")
+
     for lib_name in libs_name:
         sc(f"pip install {lib_name}")
 
@@ -39,11 +40,8 @@ def test_env_func():
 
 def test_lib_func():
     try:
-        import rustplus
-        import PIL
-        import selenium
-        import webdriver_manager
-        import disnake
+        for lib_name in libs_name:
+            exec(f"import {lib_name}")
     except ImportError:
         return False
     else:
