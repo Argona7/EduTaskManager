@@ -1,6 +1,6 @@
 import sqlite3 as sq
-from calendar import monthcalendar, weekday
-from time import time
+from calendar import monthcalendar, weekday, monthrange
+
 
 # init helpful vars
 month = {
@@ -33,6 +33,7 @@ def count_working_days(year, month):
     cal = monthcalendar(year, month)
     # create counter for work days
     working_days_count = 0
+    days_count = []
 
     # run cycle week in month
     for week in cal:
@@ -43,8 +44,9 @@ def count_working_days(year, month):
                 # Добавляем только рабочие дни (пн-пт)
                 if weekday(year, month, day) < 5:
                     working_days_count += 1
+                    days_count.append(day)
 
-    return working_days_count
+    return (working_days_count, days_count)
 
 
 # создание базы данных
@@ -83,27 +85,30 @@ def create_days_table (connect, year):
         CREATE TABLE IF NOT EXISTS DaysOfWeek{month[i]}(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         month_id INTEGER NOT NULL,
+        date TEXT NOT NULL,
         name TEXT NOT NULL,
-        FOREIGN KEY (month_id) REFERENCES {month[i]}(id)
+        FOREIGN KEY (month_id) REFERENCES {month[i]}(id) ON UPDATE CASCADE ON DELETE CASCADE
         )
         '''
         connect.cursor().execute(quary_create_table)
-        count = 0
-        #получение первого рабочего дня месяца
+        count = monthrange(year,i)[0] #получение первого рабочего дня месяца
+        if count == 5 or count == 6:
+            count = 0
+
+        len, date = count_working_days(year, i)
         #заполнение дней в таблице дней
-        for _ in range(count_working_days(year, i)):
+        for j in range(len):
 
             query_insert = f'''
-            INSERT INTO DaysofWeek{month[i]}(month_id, name)
-            VALUES (?,?)
+            INSERT INTO DaysofWeek{month[i]}(month_id, date,name)
+            VALUES (?,?,?)
            '''
-            connect.cursor().execute(query_insert, (i,day[count],))
+            connect.cursor().execute(query_insert, (i,date[j],day[count],))
             count = count + 1 if count < 4 else 0
         connect.commit()
 
 
+
+
 if __name__ == "__main__":
-    start = time()
     create_database(2023)
-    end = time()
-    print(f"\n\n[*] Speed test ILO\nFunc > create_database()\nArgs > 2023: int\nResult > {end-start}")
