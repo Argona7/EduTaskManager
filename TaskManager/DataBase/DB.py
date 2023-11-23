@@ -57,7 +57,9 @@ def create_database(year):
         create_month_table(connect)
         create_days_table(connect, year)
         create_teachers_table(connect)
-        insert_teachers_table(connect, "Титаренко")
+        create_classes_table(connect)
+        create_lessons_table(connect)
+        create_schedule_table(connect)
     # close connect
 
 
@@ -66,7 +68,7 @@ def create_database(year):
 def create_month_table(connect):
     quary_create_table= f'''
     CREATE TABLE IF NOT EXISTS Months (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY,
     month_name TEXT NOT NULL
     ) 
     '''
@@ -85,7 +87,7 @@ def create_days_table (connect, year):
     for i in range(1,13):
         quary_create_table = f'''
         CREATE TABLE IF NOT EXISTS DaysOfWeek{month[i]}(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id INTEGER PRIMARY KEY,
         month_id INTEGER NOT NULL,
         date TEXT NOT NULL,
         name TEXT NOT NULL,
@@ -112,26 +114,127 @@ def create_days_table (connect, year):
 def create_teachers_table(connect):
     query_create_table = '''
     CREATE TABLE IF NOT EXISTS Teachers (
-    id INTEGER PRIMARY KEY  AUTOINCREMENT,
+    id INTEGER PRIMARY KEY,
     name TEXT NOT NULL UNIQUE
     )
     '''
     connect.cursor().execute(query_create_table)
     connect.commit()
 
-def insert_teachers_table(connect, data):
+def edit_teachers_table(connect, data, delete):
     query_insert = '''
     INSERT INTO Teachers (name)
     VALUES (?)
     '''
+    query_delete = '''
+    DELETE FROM Teachers
+    WHERE name = ?
+    '''
 
     if type(data) == str:
         data = (data,)
-        connect.cursor().execute(query_insert, data)
+        if delete:
+            connect.cursor().execute(query_delete, data)
+        else:
+            connect.cursor().execute(query_insert, data)
     else:
         data = [(i,) for i in data]
-        connect.cursor().executemany(query_insert, data)
+        if delete:
+            connect.cursor().executemany(query_delete, data)
+        else:
+            connect.cursor().executemany(query_insert, data)
     connect.commit()
+
+
+def create_classes_table (connect):
+    query_create_table = '''
+    CREATE TABLE IF NOT EXISTS Classes(
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE
+    )
+    '''
+    connect.cursor().execute(query_create_table)
+    connect.commit()
+
+def edit_class_table (connect , data , delete):
+    query_insert = '''
+    INSERT INTO Classes(name)
+    VALUES (?)
+    '''
+    query_delete = '''
+    DELETE FROM Classes
+    WHERE name = ?
+    '''
+
+    if type(data) == str:
+        data = (data,)
+        if delete:
+            connect.cursor().execute(query_delete, data)
+        else:
+            connect.cursor().execute(query_insert, data)
+    else:
+        data = [(i,) for i in data]
+        if delete:
+            connect.cursor().executemany(query_delete, data)
+        else:
+            connect.cursor().executemany(query_insert, data)
+    connect.commit()
+
+def create_lessons_table(connect):
+    query_create_table = '''
+    CREATE TABLE IF NOT EXISTS Lessons (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE
+    )
+    '''
+    connect.cursor().execute(query_create_table)
+    connect.commit()
+
+def edit_lessons_table (connect, data, delete):
+    query_insert = '''
+    INSERT INTO Lessons(name)
+    VALUES (?)
+    '''
+    query_delete = '''
+    DELETE FROM Lessons
+    WHERE name = ?
+    '''
+
+    if type(data) == str:
+        data = (data,)
+        if delete:
+            connect.cursor().execute(query_delete, data)
+        else:
+            connect.cursor().execute(query_insert, data)
+    else:
+        data = [(i,) for i in data]
+        if delete:
+            connect.cursor().executemany(query_delete, data)
+        else:
+            connect.cursor().executemany(query_insert, data)
+    connect.commit()
+
+def create_schedule_table(connect):
+    for i in range(1,13):
+        query_create_table = f'''
+        CREATE TABLE IF NOT EXISTS Schedule{month[i]} (
+        id INTEGER PRIMARY KEY,
+        day_id INTEGER,
+        lesson_id INTEGER,
+        teacher_id INTEGER,
+        class_id INTEGER,
+        FOREIGN KEY (day_id) REFERENCES DaysOfWeek{month[i]}(id) ON UPDATE CASCADE ON DELETE CASCADE,
+        FOREIGN KEY (lesson_id) REFERENCES Lessons (id) ON UPDATE CASCADE ON DELETE CASCADE,
+        FOREIGN KEY (teacher_id)  REFERENCES Teachers (id) ON UPDATE CASCADE ON DELETE CASCADE,
+        FOREIGN KEY (class_id) REFERENCES Classes (id) ON UPDATE CASCADE ON DELETE CASCADE
+        )
+        '''
+        connect.cursor().execute(query_create_table)
+    connect.commit()
+
+def edit_schedule_table (commit , data , delete):
+    pass
+
 
 
 
