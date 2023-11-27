@@ -278,8 +278,4 @@ def edit_schedule_table(connect, date:list, day_id, lesson_id, class_id, delete:
     connect.commit()
 
 
-if __name__ == "__main__":
-    start = time()
-    create_database(2023)
-    end = time()
-    print(end - start)
+
