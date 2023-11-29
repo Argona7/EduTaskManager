@@ -1,6 +1,6 @@
 import sqlite3 as sq
 from calendar import monthcalendar, monthrange
-from time import time
+
 
 # init helpful vars
 month = {
