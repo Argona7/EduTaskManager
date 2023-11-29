@@ -54,7 +54,12 @@ def create_database(year):
     # connct to db
     db_name = f'{year}.db'
     with sq.connect(db_name) as connect:
-        pass
+        create_month_table(connect)
+        create_days_table(connect, year)
+        create_teachers_table(connect)
+        create_lessons_table(connect)
+        create_classes_table(connect)
+        return connect
     # close connect
 
 
