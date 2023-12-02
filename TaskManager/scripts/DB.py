@@ -159,7 +159,7 @@ def create_schedule_table(connect, date: list):
     day_id INTEGER,
     lesson_id INTEGER,
     class_id INTEGER,
-    FOREIGN KEY (day_id) REFERENCES DaysOfWeek{month[i]}(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (day_id) REFERENCES DaysOfWeek{month[int(date[1])]}(id) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (lesson_id) REFERENCES Lessons (id) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (class_id) REFERENCES Classes (id) ON UPDATE CASCADE ON DELETE CASCADE
     )
@@ -298,4 +298,4 @@ def update_schedule_table(connect, data:dict, delete: bool, ):
     connect.commit()
 
 if __name__ == '__main__':
-    main()
+    create_schedule_table(sq.connect('2023.db'), ['2023', '3', '28'])

@@ -1,0 +1,63 @@
+openapi: 3.0.0
+info:
+  title: "TaskMaster API"
+  description: "API Documentation for TaskMaster API"
+  version: "1.0.0"
+paths:
+  /get_data:
+    get:
+      summary: "Get data"
+      parameters:
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+        - name: table
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "Successful response"
+          content:
+            application/json:
+              example:
+                data: {}
+
+  /update_data:
+    post:
+      summary: "Update data"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                year:
+                  type: string
+                function_update:
+                  type: string
+                data:
+                  type: object
+                delete:
+                  type: string
+      responses:
+        '200':
+          description: "Successful response"
+          content:
+            application/json:
+              example:
+                message: "Data updated successfully"
+        '400':
+          description: "Bad Request"
+          content:
+            application/json:
+              example:
+                error: 'Bad Request'
+                details:
+                  error : 'Some error occurred'

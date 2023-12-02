@@ -1,1 +1,5 @@
 venv/
+TaskManager/scripts/__init__.py
+TaskManager/scripts/Tables.txt
+TaskManager/scripts/test_post_query.py
+TaskManager/scripts/test_get_query.py
