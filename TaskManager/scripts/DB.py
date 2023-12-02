@@ -1,6 +1,6 @@
 import sqlite3 as sq
 from calendar import monthcalendar, monthrange
-
+from argparse import ArgumentParser
 
 # init helpful vars
 month = {
@@ -49,6 +49,14 @@ def count_working_days(year, month):
     return (working_days_count, days_count)
 
 
+def main():
+    parser = ArgumentParser(description="Создание базы данных для указаннного года ")
+    parser.add_argument('year', type=int, help='Год для создании ьазы данных')
+    args = parser.parse_args()
+
+    create_database(args.year)
+
+
 # создание базы данных
 def create_database(year):
     # connct to db
@@ -57,8 +65,8 @@ def create_database(year):
         create_month_table(connect)
         create_days_table(connect, year)
         create_teachers_table(connect)
-        create_lessons_table(connect)
         create_classes_table(connect)
+        create_lessons_table(connect)
         return connect
     # close connect
 
@@ -121,35 +129,6 @@ def create_teachers_table(connect):
     connect.cursor().execute(query_create_table)
     connect.commit()
 
-
-def edit_teachers_table(connect, name, delete:bool):
-    query_insert = '''
-    INSERT INTO Teachers (name)
-    VALUES (?)
-    '''
-    query_delete = '''
-    DELETE FROM Teachers
-    WHERE name = ?
-    '''
-
-    # проверка входных данных на тип массива
-    if  isinstance(name, list):
-        # вставка или удаление данных
-        name = [(i,) for i in name]
-        if delete:
-            connect.cursor().executemany(query_delete, name)
-        else:
-            connect.cursor().executemany(query_insert, name)
-    #если элемент не имеет тип массива (строки, числа)
-    else:
-        # вставка или удаление данных
-        if delete:
-            connect.cursor().execute(query_delete, (name,))
-        else:
-            connect.cursor().execute(query_insert, (name,))
-    connect.commit()
-
-
 def create_classes_table(connect):
     query_create_table = '''
     CREATE TABLE IF NOT EXISTS Classes(
@@ -159,35 +138,6 @@ def create_classes_table(connect):
     '''
     connect.cursor().execute(query_create_table)
     connect.commit()
-
-
-def edit_class_table(connect, name, delete:bool):
-    query_insert = '''
-    INSERT INTO Classes(name)
-    VALUES (?)
-    '''
-    query_delete = '''
-    DELETE FROM Classes
-    WHERE name = ?
-    '''
-
-    # проверка входных данных на тип массива
-    if  isinstance(name, list):
-        # вставка или удаление данных
-        name = [(i,) for i in name]
-        if delete:
-            connect.cursor().executemany(query_delete, name)
-        else:
-            connect.cursor().executemany(query_insert, name)
-    #если элемент не имеет тип массива (строки, числа)
-    else:
-        # вставка или удаление данных
-        if delete:
-            connect.cursor().execute(query_delete, (name,))
-        else:
-            connect.cursor().execute(query_insert, (name,))
-    connect.commit()
-
 
 def create_lessons_table(connect):
     query_create_table = '''
@@ -201,39 +151,7 @@ def create_lessons_table(connect):
     connect.cursor().execute(query_create_table)
     connect.commit()
 
-
-def edit_lessons_table(connect, name, teacher_id, delete: bool):
-    query_insert = '''
-    INSERT INTO Lessons(name, teacher_id)
-    VALUES (?,?)
-    '''
-    query_delete = '''
-    DELETE FROM Lessons
-    WHERE name = ?
-    '''
-    # проверка входных данных на тип массива
-    if all(isinstance(arg, list) for arg in [name, teacher_id]):
-        # вставка или удаление данных
-        values = [(i,j) for i,j in zip(name,teacher_id)]
-        if delete:
-            name = [(i,) for i in name]
-            connect.cursor().executemany(query_delete, name)
-        else:
-            connect.cursor().executemany(query_insert, values)
-    # проверка входных данных на тип массива , (если 1 условие неверно , но верно 2 условие то вызывается ошибка несоответствия типов)
-    elif any(isinstance(arg, list) for arg in [name, teacher_id]):
-        raise TypeError
-    #если элементы не имеют тип массива (строки, числа)
-    else:
-        # вставка или удаление данных
-        if delete:
-            connect.cursor().execute(query_delete, (name,))
-        else:
-            connect.cursor().execute(query_insert, (name, teacher_id))
-    connect.commit()
-
-
-def create_schedule_table(connect, date:list):
+def create_schedule_table(connect, date: list):
     # создание расписания
     query_create_table = f'''
     CREATE TABLE IF NOT EXISTS Schedule_{date[0]}_{date[1]}_{date[2]}(
@@ -249,8 +167,106 @@ def create_schedule_table(connect, date:list):
     connect.cursor().execute(query_create_table)
     connect.commit()
 
+#data = {name : str}
+def update_teachers_table(connect, data:dict, delete: bool):
+    name = data['name']
+    query_insert = '''
+    INSERT INTO Teachers (name)
+    VALUES (?)
+    '''
+    query_delete = '''
+    DELETE FROM Teachers
+    WHERE name = ?
+    '''
+    # проверка входных данных на тип массива
+    if isinstance(name, list):
+        # вставка или удаление данных
+        name = [(i,) for i in name]
+        if delete:
+            connect.cursor().executemany(query_delete, name)
+        else:
+            connect.cursor().executemany(query_insert, name)
+    # если элемент не имеет тип массива (строки, числа)
+    else:
+        # вставка или удаление данных
+        if delete:
+            connect.cursor().execute(query_delete, (name,))
+        else:
+            connect.cursor().execute(query_insert, (name,))
+    connect.commit()
 
-def edit_schedule_table(connect, date:list, day_id, lesson_id, class_id, delete:bool, ):
+#data = {name: str}
+def update_class_table(connect, data:dict, delete: bool):
+    name = data['name']
+
+    query_insert = '''
+    INSERT INTO Classes(name)
+    VALUES (?)
+    '''
+    query_delete = '''
+    DELETE FROM Classes
+    WHERE name = ?
+    '''
+    # проверка входных данных на тип массива
+    if isinstance(name, list):
+        # вставка или удаление данных
+        name = [(i,) for i in name]
+        if delete:
+            connect.cursor().executemany(query_delete, name)
+        else:
+            connect.cursor().executemany(query_insert, name)
+    # если элемент не имеет тип массива (строки, числа)
+    else:
+        # вставка или удаление данных
+        if delete:
+            connect.cursor().execute(query_delete, (name,))
+        else:
+            connect.cursor().execute(query_insert, (name,))
+    connect.commit()
+
+
+
+#data = {name : str, teacher_id : int}
+def  update_lessons_table(connect, data:dict, delete: bool):
+    name = data['name']
+    teacher_id = data['teacher_id']
+
+    query_insert = '''
+    INSERT INTO Lessons(name, teacher_id)
+    VALUES (?,?)
+    '''
+    query_delete = '''
+    DELETE FROM Lessons
+    WHERE name = ?
+    '''
+    # проверка входных данных на тип массива
+    if all(isinstance(arg, list) for arg in [name, teacher_id]):
+        # вставка или удаление данных
+        values = [(i, j) for i, j in zip(name, teacher_id)]
+        if delete:
+            name = [(i,) for i in name]
+            connect.cursor().executemany(query_delete, name)
+        else:
+            connect.cursor().executemany(query_insert, values)
+    # проверка входных данных на тип массива , (если 1 условие неверно , но верно 2 условие то вызывается ошибка несоответствия типов)
+    elif any(isinstance(arg, list) for arg in [name, teacher_id]):
+        raise TypeError
+    # если элементы не имеют тип массива (строки, числа)
+    else:
+        # вставка или удаление данных
+        if delete:
+            connect.cursor().execute(query_delete, (name,))
+        else:
+            connect.cursor().execute(query_insert, (name, teacher_id))
+    connect.commit()
+
+
+#data = {date:list , day_id:int , lesson_id: int, class_id : int}
+def update_schedule_table(connect, data:dict, delete: bool, ):
+    date = data['date']
+    day_id = data['day_id']
+    lesson_id = data['lesson_id']
+    class_id = data['class_id']
     query_insert = f'''
     INSERT INTO Schedule_{date[0]}_{date[1]}_{date[2]}(day_id, lesson_id, class_id)
     VALUES (?,?,?)
@@ -259,7 +275,6 @@ def edit_schedule_table(connect, date:list, day_id, lesson_id, class_id, delete:
     DELETE FROM Schedule_{date[0]}_{date[1]}_{date[2]}
     WHERE day_id = ?
     '''
-
     # проверка входных данных на тип массива
     if all(isinstance(arg, list) for arg in [day_id, lesson_id, class_id]):
         values = [(i, j, k) for i, j, k in zip(day_id, lesson_id, class_id)]
@@ -282,5 +297,5 @@ def edit_schedule_table(connect, date:list, day_id, lesson_id, class_id, delete:
 
     connect.commit()
 
-
-
+if __name__ == '__main__':
+    main()
