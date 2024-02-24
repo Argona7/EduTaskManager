@@ -57,4 +57,4 @@ def update_data():
 
 if __name__ == "__main__":
     #запуск сервера
-    app.run(debug=False)
+    app.run(debug=False, ssl_context=('../cert/certificate.crt', '../cert/privateKey.key'))
